@@ -4,6 +4,9 @@
     IBOutlet NSOutlineView *sidebarOutlineView;
     IBOutlet NSTableView *chatTableView;
     IBOutlet NSSplitView *splitView;
+    IBOutlet NSView *toolbarView;
+    IBOutlet NSTextField *chatInputField;
+    IBOutlet NSButton *sendButton;
     
     NSMutableArray *sidebarItems;
     NSMutableArray *chatMessages;
@@ -13,5 +16,8 @@
 - (void)setupWindow;
 - (void)setupSidebar;
 - (void)setupChatTable;
+- (void)setupToolbar;
+- (void)setupChatInput;
+- (IBAction)sendMessage:(id)sender;
 
 @end
