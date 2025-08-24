@@ -3,12 +3,12 @@
 @class MainWindowController;
 
 @interface App : NSObject {
-    MainWindowController *mainWindowController;
+    id mainWindowController;  // Use id to avoid import dependency
 }
 
 + (App *)sharedApp;
 - (void)initialize;
 - (void)showMainWindow;
-- (MainWindowController *)mainWindowController;
+- (id)mainWindowController;
 
 @end

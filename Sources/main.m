@@ -1,16 +1,16 @@
 #import <Cocoa/Cocoa.h>
-#import "AppDelegate.h"
+#import "App.h"
 
 int main(int argc, char *argv[]) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     NSApplication *app = [NSApplication sharedApplication];
-    AppDelegate *delegate = [[AppDelegate alloc] init];
-    [app setDelegate:delegate];
+    App *appDelegate = [[App alloc] init];
+    [app setDelegate:appDelegate];
     
     [app run];
     
-    [delegate release];
+    [appDelegate release];
     [pool release];
     return 0;
 }

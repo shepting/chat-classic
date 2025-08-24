@@ -1,5 +1,16 @@
 # ChatGPT Classic - Changelog
 
+## Version 5.0 (2025-08-24)
+### Modular Bazel Architecture
+- **Separate Bazel Modules**: Each component now has its own BUILD file in Sources/ directory
+- **Cross-Module Dependencies**: Proper dependency resolution between App, MainWindow, and component modules
+- **Header Visibility**: Fixed include paths with `includes = ["."]` for cross-module imports
+- **Circular Dependency Resolution**: App module uses runtime class loading to avoid import cycles
+- **Individual Module Builds**: All modules (App, HistoryTable, ChatConversation, ChatInput, Networking) build independently
+- **Full Application Build**: Complete application builds successfully with modular architecture
+- **Runtime Compatibility**: Application launches and runs with separated module structure
+- **Build System Optimization**: Streamlined Bazel configuration for modular development
+
 ## Version 4.0 (2025-08-24)
 ### Modular Architecture Refactor
 - **App Module**: Centralized application management with singleton pattern

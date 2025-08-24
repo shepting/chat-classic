@@ -1,5 +1,4 @@
 #import "App.h"
-#import "MainWindowController.h"
 
 static App *sharedAppInstance = nil;
 
@@ -27,7 +26,9 @@ static App *sharedAppInstance = nil;
 
 - (void)initialize {
     if (!mainWindowController) {
-        mainWindowController = [[MainWindowController alloc] init];
+        // Use runtime class loading to avoid import dependency
+        Class MainWindowControllerClass = NSClassFromString(@"MainWindowController");
+        mainWindowController = [[MainWindowControllerClass alloc] init];
     }
 }
 
@@ -37,7 +38,7 @@ static App *sharedAppInstance = nil;
     [[mainWindowController window] makeKeyAndOrderFront:nil];
 }
 
-- (MainWindowController *)mainWindowController {
+- (id)mainWindowController {
     return mainWindowController;
 }
 
