@@ -1,0 +1,77 @@
+# Legacy macOS AppKit Project with Bazel and Objective-C
+
+This document explains how to create an AppKit project for macOS 10.4 (Tiger) using Bazel build system and Objective-C.
+
+## Overview
+
+This project demonstrates building a legacy macOS application that:
+- Targets macOS 10.4 Tiger (PowerPC and Intel)
+- Uses AppKit framework
+- Features a main window with sidebar and table view
+- Is built using Google's Bazel build system
+
+## Project Structure
+
+```
+ChatGPTClassic/
+├── WORKSPACE
+├── BUILD
+├── Sources/
+│   ├── main.m
+│   ├── AppDelegate.h
+│   ├── AppDelegate.m
+│   ├── MainWindowController.h
+│   └── MainWindowController.m
+└── Resources/
+    └── Info.plist
+```
+
+## Key Components
+
+### WORKSPACE Configuration
+- Configures Bazel for macOS development
+- Sets minimum deployment target to 10.4
+- Includes Apple platform rules
+
+### BUILD File
+- Uses `genrule` to call clang directly (bypassing Bazel's Objective-C toolchain requirements)
+- Links AppKit and Foundation frameworks
+- Specifies deployment target and disables ARC for legacy compatibility
+
+### Application Components
+1. **main.m**: Application entry point
+2. **AppDelegate**: Handles application lifecycle
+3. **MainWindowController**: Manages the main window with sidebar and table view
+
+## Building and Running
+
+Since Bazel 8+ requires Apple toolchain support for `objc_library`, we use a `genrule` approach to call clang directly:
+
+```bash
+# Build the application using Bazel with WORKSPACE (not bzlmod)
+bazel build --noenable_bzlmod --enable_workspace //:build_app
+
+# Run the compiled binary directly
+./bazel-bin/ChatGPTClassic
+
+# Alternative: Build with clang directly (simpler for legacy projects)
+clang -fno-objc-arc -mmacosx-version-min=10.4 -framework AppKit -framework Foundation Sources/*.m -o ChatGPTClassic
+```
+
+## Legacy Considerations
+
+- Uses retain/release memory management (no ARC)
+- Compatible with PowerPC and early Intel Macs (when using appropriate deployment target)
+- Uses deprecated but period-appropriate APIs (warnings expected)
+- Manually manages memory allocation
+- Implements NSOutlineView and NSTableView data sources for sidebar and chat views
+- Creates programmatic UI layout without Interface Builder/XIB files
+
+## Implementation Notes
+
+The application creates a main window with:
+- **Left sidebar**: NSOutlineView showing conversation list
+- **Right panel**: NSTableView displaying chat messages  
+- **Split view**: Resizable divider between panels
+
+Warnings about deprecated APIs and protocol conformance are expected when building against modern SDKs while targeting legacy systems. This is normal for legacy compatibility code.

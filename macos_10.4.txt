@@ -1,0 +1,155 @@
+# macOS 10.4 Tiger - AppKit Features (April 2005)
+
+## Overview
+macOS 10.4 Tiger was a landmark release that introduced numerous AppKit enhancements, including significant improvements to table views, outline views, and the foundation for modern sidebar interfaces. Tiger also brought Core Data integration and enhanced graphics capabilities.
+
+## Major AppKit Features
+
+### NSTableView Revolutionary Enhancements
+- **View-based table views (early foundations)**: Groundwork for the view-based model introduced fully in 10.7
+- **Enhanced data source binding**: Better integration with Cocoa Bindings for automatic data synchronization
+- **Improved cell rendering**: More efficient and customizable cell drawing
+- **Advanced sorting**: Built-in sort descriptors and column header sorting with visual indicators
+- **Enhanced selection appearance**: Better highlight colors and selection feedback
+- **Group rows support**: Ability to create section headers and grouped content
+- **Improved drag and drop**: Enhanced drag and drop with better visual feedback and validation
+
+### NSOutlineView Major Improvements
+- **Source list appearance (beta)**: Early implementation of the sidebar appearance that would be formalized in 10.5
+- **Enhanced item management**: Better performance with large hierarchical data sets
+- **Improved expand/collapse**: Smoother animations and better state management
+- **Advanced selection model**: Multi-level selection and keyboard navigation improvements
+- **Item badges and indicators**: Better support for status indicators and badges on items
+- **Drag and drop enhancements**: Full drag and drop reordering with hierarchy preservation
+
+### Window and Layout Management
+- **Enhanced NSSplitView**: Major improvements for sidebar layouts
+  - Proportional resizing options
+  - Better minimum/maximum constraints
+  - Improved divider appearance and behavior
+  - Support for collapsible panes
+- **Dashboard integration**: AppKit widgets can be Dashboard widgets
+- **Spotlight integration**: Search field integration with system-wide search
+- **Enhanced window management**: Better support for auxiliary windows and panels
+
+### Sidebar and Navigation Revolution
+- **NSBrowser enhancements**: Significant improvements to column-based navigation
+  - Better appearance customization
+  - Enhanced selection and highlighting
+  - Improved column width management
+  - Better integration with file system navigation
+- **Source list foundations**: Proto-source list appearance for outline views
+- **Navigation patterns**: Better support for iTunes/Finder-style sidebar layouts
+
+### Core Data Integration
+- **NSArrayController**: Automatic table view population from Core Data
+- **NSTreeController**: Hierarchical data management for outline views
+- **Cocoa Bindings**: Automatic synchronization between model and view
+- **Predicate-based filtering**: Built-in search and filter capabilities
+
+### Graphics and Animation
+- **Core Animation (private)**: Early animation support (public in 10.5)
+- **Improved Quartz**: Better performance and new drawing capabilities
+- **Enhanced PDF support**: Better PDF rendering and manipulation
+- **Improved image processing**: New image effects and transformations
+
+### Controls and Interface Elements
+- **NSSearchField enhancements**: Integration with Spotlight and predicate searching
+- **Enhanced NSPopUpButton**: Better menu behavior and appearance
+- **NSLevelIndicator improvements**: More styling options and better performance
+- **New NSPathControl**: File path navigation control (introduced in 10.4)
+- **Enhanced NSSegmentedControl**: Better appearance and behavior options
+
+## Developer Impact
+
+### Modern Table/Outline Development Patterns
+```objc
+// Core Data integration with NSArrayController
+NSArrayController *arrayController = [[NSArrayController alloc] init];
+[arrayController setManagedObjectContext:managedObjectContext];
+[arrayController setEntityName:@"EntityName"];
+
+// Binding table view to array controller
+[tableView bind:@"content" toObject:arrayController withKeyPath:@"arrangedObjects" options:nil];
+[tableView bind:@"selection" toObject:arrayController withKeyPath:@"selection" options:nil];
+
+// Enhanced outline view with tree controller
+NSTreeController *treeController = [[NSTreeController alloc] init];
+[outlineView bind:@"content" toObject:treeController withKeyPath:@"arrangedObjects" options:nil];
+```
+
+### Sidebar Implementation Patterns
+```objc
+// Early source list appearance (refined in 10.5)
+[outlineView setSelectionHighlightStyle:NSTableViewSelectionHighlightStyleSourceList];
+
+// Split view sidebar layout
+NSSplitView *splitView = [[NSSplitView alloc] init];
+[splitView setDelegate:self]; // For collapsible sidebar behavior
+```
+
+### Advanced NSTableView Features
+```objc
+// Group row support
+- (BOOL)tableView:(NSTableView *)tableView isGroupRow:(NSInteger)row;
+
+// Enhanced drag and drop
+- (BOOL)tableView:(NSTableView *)tableView 
+        writeRowsWithIndexes:(NSIndexSet *)rowIndexes 
+        toPasteboard:(NSPasteboard *)pboard;
+
+// Advanced sorting
+- (void)tableView:(NSTableView *)tableView 
+   sortDescriptorsDidChange:(NSArray *)oldDescriptors;
+```
+
+## Key Features for Sidebar Applications
+
+### Source List Appearance (Early Implementation)
+- Visual appearance similar to iTunes and Finder sidebars
+- Better selection highlighting for navigation interfaces
+- Enhanced support for hierarchical content organization
+- Foundation for the formal source list style in 10.5
+
+### Enhanced Split View Layouts
+- Collapsible sidebar panes
+- Better proportional resizing
+- Improved visual feedback for resize operations
+- Support for complex multi-pane layouts
+
+### Navigation Patterns
+- Column-based navigation (NSBrowser) reaches maturity
+- Better support for master-detail interfaces
+- Enhanced hierarchical navigation with NSOutlineView
+- Integration with system-wide navigation conventions
+
+## Notable Features and Limitations
+
+### Advantages
+- Core Data integration revolutionizes data-driven interfaces
+- Cocoa Bindings dramatically reduce boilerplate code
+- Better performance with large data sets
+- Enhanced visual appearance and consistency
+
+### Limitations
+- Source list appearance still being refined (finalized in 10.5)
+- Some animation capabilities limited (Core Animation private until 10.5)
+- View-based table views not yet available (introduced in 10.7)
+- Some modern layout features not yet available
+
+## Legacy Development Recommendations
+
+When targeting 10.4 for legacy applications:
+- Take full advantage of Core Data and Cocoa Bindings for data-driven interfaces
+- Use the early source list appearance for sidebar navigation
+- Implement enhanced NSSplitView layouts for modern-feeling interfaces
+- Leverage NSPathControl for file navigation
+- Use NSSearchField with Spotlight integration
+- Implement proper drag and drop for better user experience
+
+## Migration Notes from Earlier Versions
+- Replace manual data source management with Cocoa Bindings where possible
+- Update table view implementations to use new delegate methods
+- Consider Core Data for data persistence and management
+- Enhance existing sidebar interfaces with improved visual styling
+- Add drag and drop support to existing table and outline views

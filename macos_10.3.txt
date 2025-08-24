@@ -1,0 +1,106 @@
+# macOS 10.3 Panther - AppKit Features (October 2003)
+
+## Overview
+macOS 10.3 Panther brought significant user interface refinements and introduced several foundational technologies that would shape future macOS development, including improved window management and table view capabilities.
+
+## Major AppKit Features
+
+### NSTableView Enhancements
+- **Variable row heights**: Native support for rows with different heights in the same table
+- **Improved cell editing**: Better in-place editing experience with enhanced text field behavior
+- **Enhanced selection model**: More sophisticated multi-selection and range selection capabilities
+- **Better scrolling performance**: Optimized rendering for large data sets
+- **Column header improvements**: Enhanced column header appearance and interaction
+- **Table view alternating row colors**: Built-in support for zebra-striped table backgrounds
+
+### NSOutlineView Improvements  
+- **Smoother animations**: Enhanced expand/collapse animations for outline items
+- **Better indentation control**: More precise control over item indentation levels
+- **Improved item badge support**: Better visual indicators for outline view items
+- **Enhanced drag and drop**: More robust drag and drop reordering capabilities
+- **Keyboard navigation**: Improved arrow key and type-ahead selection
+
+### Window and Layout Management
+- **Enhanced NSSplitView**: Significant improvements to split view divider behavior
+  - Smoother resizing animations
+  - Better minimum/maximum size constraints
+  - Improved visual feedback during resize
+- **Window exposé integration**: AppKit windows work seamlessly with new Exposé feature
+- **Fast user switching support**: Windows properly hide/show during user switching
+- **Improved window shadows**: More realistic and performance-optimized drop shadows
+
+### Sidebar and Navigation
+- **NSBrowser enhancements**: Improved column-based navigation
+  - Better column width management
+  - Enhanced selection appearance
+  - Improved keyboard navigation
+- **Drawer refinements**: Enhanced NSDrawer animation and positioning
+- **Source list foundations**: Early groundwork for what would become source lists (formal API in 10.5)
+
+### Graphics and Rendering
+- **PDF Kit introduction**: NSPDFImageRep and basic PDF rendering support
+- **Improved Quartz rendering**: Better performance for complex graphics
+- **Enhanced image processing**: Improved NSImage scaling and effects
+- **Better font rendering**: Refined text appearance and performance
+
+### Controls and Interface Elements
+- **Refined Aqua controls**: Updated appearance for buttons, sliders, and other controls
+- **Enhanced NSSearchField**: Introduction of the modern search field control
+- **Improved NSPopUpButton**: Better popup menu behavior and appearance
+- **NSLevelIndicator**: New level indicator control for progress/rating display
+
+## Developer Impact
+
+### Table and Outline Views
+- More powerful data source and delegate protocols
+- Better performance optimization options
+- Enhanced customization capabilities for cell rendering
+- Improved accessibility support
+
+### Window Layout Strategies
+- Split view layouts become more practical for complex interfaces
+- Better foundation for sidebar-style applications
+- Improved window management for document-based apps
+- Enhanced support for auxiliary panels and inspectors
+
+### Interface Design Patterns
+- Column-based navigation (NSBrowser) more refined
+- Drawer-based supplementary content still prevalent
+- Foundation laid for future source list patterns
+- Better integration with system-wide UI conventions
+
+## Notable Features for Legacy Development
+
+### NSTableView Best Practices (10.3)
+```objc
+// Variable row height support
+- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row;
+
+// Enhanced selection handling
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row;
+
+// Improved cell customization
+- (void)tableView:(NSTableView *)tableView 
+   willDisplayCell:(id)cell 
+    forTableColumn:(NSTableColumn *)tableColumn 
+               row:(NSInteger)row;
+```
+
+### Sidebar-Style Layouts
+- Use NSSplitView with NSOutlineView for hierarchical navigation
+- NSBrowser for file system or nested category browsing
+- NSDrawer for supplementary content (though later deprecated)
+
+## Limitations and Considerations
+- No formal "source list" appearance yet (introduced in 10.5)
+- Limited animation capabilities compared to later versions
+- Drawer-based designs still preferred over embedded sidebars
+- Some accessibility features still developing
+
+## Legacy Compatibility Notes
+When targeting 10.3 for legacy applications:
+- Take advantage of variable row heights for rich table content
+- Use enhanced NSSplitView for better sidebar layouts
+- Implement proper delegate methods for improved table performance
+- Consider NSBrowser for hierarchical data navigation
+- Use NSSearchField for modern search interfaces

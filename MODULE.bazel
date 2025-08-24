@@ -1,0 +1,7 @@
+module(
+    name = "chatgpt_classic",
+    version = "1.0.0",
+)
+
+bazel_dep(name = "rules_apple", version = "4.1.2")
+bazel_dep(name = "apple_support", version = "1.15.1")

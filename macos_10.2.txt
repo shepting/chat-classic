@@ -1,0 +1,69 @@
+# macOS 10.2 Jaguar - AppKit Features (August 2002)
+
+## Overview
+macOS 10.2 Jaguar introduced significant refinements to the Aqua interface and several important AppKit enhancements, building on the foundation established in 10.0 and 10.1.
+
+## Key AppKit Features
+
+### NSTableView Enhancements
+- **Improved column resizing**: Better column width management and user interaction
+- **Enhanced sorting support**: Built-in column header sorting indicators and callbacks
+- **Table column autosaving**: Automatic persistence of column widths and positions
+- **Better keyboard navigation**: Improved arrow key navigation and selection handling
+- **Row height customization**: Support for variable row heights in table views
+
+### NSOutlineView Improvements
+- **Disclosure triangle refinements**: Better visual feedback for expandable items
+- **Improved indentation**: More consistent and visually appealing item hierarchy display
+- **Enhanced drag and drop**: Better support for reordering outline view items
+- **Keyboard expansion/collapse**: Spacebar and arrow key support for outline navigation
+
+### Window Management
+- **Enhanced NSSplitView**: Improved split view divider behavior and appearance
+- **Window shadows**: System-wide drop shadows for all windows (Quartz Extreme)
+- **Better window resizing**: Improved live resize performance and visual feedback
+- **Toolbar enhancements**: More flexible toolbar customization options
+
+### Sidebar-Related Features
+- **NSBrowser improvements**: Enhanced browser view for hierarchical navigation
+- **Better column view support**: Foundation for modern sidebar-style navigation
+- **Drawer enhancements**: Improved NSDrawer behavior and animations (though drawers later deprecated)
+
+### Graphics and Rendering
+- **Quartz Extreme**: Hardware-accelerated window compositing (on supported hardware)
+- **Anti-aliased text**: System-wide text smoothing improvements
+- **Enhanced bezier paths**: Better NSBezierPath performance and capabilities
+- **Improved image rendering**: Better NSImage scaling and display
+
+### Controls and UI Elements
+- **Refined Aqua appearance**: Subtle improvements to button and control appearance
+- **Enhanced NSPopUpButton**: Better popup button behavior and styling
+- **Improved NSTabView**: Enhanced tab view appearance and functionality
+- **Better focus rings**: More consistent focus indication across controls
+
+## Developer Impact
+
+### NSTableView/NSOutlineView Development
+- More robust data source protocols
+- Better performance with large data sets
+- Enhanced delegate methods for customization
+- Improved selection and highlighting behavior
+
+### Window Layout
+- Better support for complex window layouts
+- Improved auto-layout foundations (precursor to Auto Layout)
+- Enhanced split view behavior for sidebar-style interfaces
+- Better window animation and effects support
+
+## Notable Limitations
+- No formal sidebar API yet (introduced later in 10.5+)
+- Limited theming support compared to later versions
+- Some visual inconsistencies in complex table/outline hierarchies
+- Drawer-based navigation still preferred over embedded sidebars
+
+## Legacy Compatibility Notes
+When targeting 10.2 for legacy applications:
+- Use NSOutlineView for hierarchical sidebar content
+- Implement manual column management for NSTableView
+- Handle window layout programmatically without modern constraints
+- Use NSBrowser for file system navigation interfaces
