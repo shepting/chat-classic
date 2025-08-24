@@ -76,8 +76,8 @@
     [[toolbarView layer] setBackgroundColor:[[NSColor colorWithCalibratedRed:0.98 green:0.98 blue:0.98 alpha:1.0] CGColor]];
     [chatContainer addSubview:toolbarView];
     
-    // Chat input at bottom (60px height)
-    NSRect inputFrame = NSMakeRect(0, 0, containerBounds.size.width, 60);
+    // Chat input at bottom (80px height for multi-line)
+    NSRect inputFrame = NSMakeRect(0, 0, containerBounds.size.width, 80);
     NSView *inputContainer = [[NSView alloc] initWithFrame:inputFrame];
     [inputContainer setAutoresizingMask:(NSViewWidthSizable | NSViewMaxYMargin)];
     [inputContainer setWantsLayer:YES];
@@ -85,8 +85,8 @@
     [chatContainer addSubview:inputContainer];
     
     // Chat messages area in the middle
-    NSRect chatFrame = NSMakeRect(0, 60, containerBounds.size.width, 
-                                 containerBounds.size.height - 110); // 50 for toolbar + 60 for input
+    NSRect chatFrame = NSMakeRect(0, 80, containerBounds.size.width, 
+                                 containerBounds.size.height - 130); // 50 for toolbar + 80 for input
     [self setupChatTable:chatFrame inContainer:chatContainer];
     
     // Setup input field in input container
@@ -160,22 +160,41 @@
 - (void)setupInputInContainer:(NSView *)inputContainer {
     NSRect containerBounds = [inputContainer bounds];
     
-    // Chat input field (with padding)
-    NSRect inputFieldFrame = NSMakeRect(20, 15, containerBounds.size.width - 100, 30);
-    chatInputField = [[NSTextField alloc] initWithFrame:inputFieldFrame];
-    [chatInputField setAutoresizingMask:(NSViewWidthSizable)];
-    [chatInputField setTarget:self];
-    [chatInputField setAction:@selector(sendMessage:)];
-    [[chatInputField cell] setPlaceholderString:@"Ask anything"];
-    [inputContainer addSubview:chatInputField];
+    // Create scroll view for multi-line text input
+    NSRect scrollFrame = NSMakeRect(20, 20, containerBounds.size.width - 110, 40);
+    NSScrollView *inputScrollView = [[NSScrollView alloc] initWithFrame:scrollFrame];
+    [inputScrollView setAutoresizingMask:(NSViewWidthSizable)];
+    [inputScrollView setHasVerticalScroller:YES];
+    [inputScrollView setBorderType:NSBezelBorder];
+    [inputScrollView setAutohidesScrollers:YES];
     
-    // Send button
-    NSRect buttonFrame = NSMakeRect(containerBounds.size.width - 70, 15, 50, 30);
+    // Chat input text view (multi-line)
+    NSRect textFrame = [[inputScrollView contentView] bounds];
+    chatInputField = [[NSTextView alloc] initWithFrame:textFrame];
+    [chatInputField setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
+    [chatInputField setRichText:NO];
+    [chatInputField setImportsGraphics:NO];
+    [chatInputField setFont:[NSFont systemFontOfSize:13]];
+    [chatInputField setTextContainerInset:NSMakeSize(5, 5)];
+    
+    // Set placeholder-like behavior (macOS 10.4 doesn't have native placeholder for NSTextView)
+    [chatInputField setString:@"Ask anything"];
+    [chatInputField setTextColor:[NSColor grayColor]];
+    [chatInputField setDelegate:self];
+    
+    [inputScrollView setDocumentView:chatInputField];
+    [inputContainer addSubview:inputScrollView];
+    [inputScrollView release];
+    
+    // Send button with Aqua style
+    NSRect buttonFrame = NSMakeRect(containerBounds.size.width - 80, 30, 60, 20);
     sendButton = [[NSButton alloc] initWithFrame:buttonFrame];
     [sendButton setAutoresizingMask:(NSViewMinXMargin)];
     [sendButton setTitle:@"Send"];
     [sendButton setTarget:self];
     [sendButton setAction:@selector(sendMessage:)];
+    [sendButton setBezelStyle:NSRoundedBezelStyle]; // Aqua style
+    [sendButton setKeyEquivalent:@"\r"]; // Enter key equivalent
     [inputContainer addSubview:sendButton];
 }
 
@@ -202,15 +221,44 @@
 }
 
 - (IBAction)sendMessage:(id)sender {
-    NSString *message = [chatInputField stringValue];
-    if ([message length] > 0) {
+    NSString *message = [chatInputField string];
+    // Trim whitespace and check if not empty and not just placeholder text
+    message = [message stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if ([message length] > 0 && ![message isEqualToString:@"Ask anything"]) {
         [chatMessages addObject:message];
         [chatTableView reloadData];
-        [chatInputField setStringValue:@""];
+        
+        // Clear input and reset placeholder
+        [chatInputField setString:@"Ask anything"];
+        [chatInputField setTextColor:[NSColor grayColor]];
         
         // Scroll to bottom
         if ([chatMessages count] > 0) {
             [chatTableView scrollRowToVisible:[chatMessages count] - 1];
+        }
+    }
+}
+
+#pragma mark - NSTextView Delegate
+
+- (void)textDidBeginEditing:(NSNotification *)notification {
+    NSTextView *textView = [notification object];
+    if (textView == chatInputField) {
+        NSString *currentText = [textView string];
+        if ([currentText isEqualToString:@"Ask anything"]) {
+            [textView setString:@""];
+            [textView setTextColor:[NSColor blackColor]];
+        }
+    }
+}
+
+- (void)textDidEndEditing:(NSNotification *)notification {
+    NSTextView *textView = [notification object];
+    if (textView == chatInputField) {
+        NSString *currentText = [[textView string] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        if ([currentText length] == 0) {
+            [textView setString:@"Ask anything"];
+            [textView setTextColor:[NSColor grayColor]];
         }
     }
 }
