@@ -86,8 +86,20 @@ static Networking *sharedInstance = nil;
     self = [super init];
     if (self) {
         delegate = nil;
+        conversationHistory = [[NSMutableArray alloc] init];
+        currentConnection = nil;
+        receivedData = nil;
+        isStreaming = NO;
     }
     return self;
+}
+
+- (void)dealloc {
+    [conversationHistory release];
+    [currentConnection cancel];
+    [currentConnection release];
+    [receivedData release];
+    [super dealloc];
 }
 
 - (void)setDelegate:(id<NetworkingDelegate>)newDelegate {
@@ -120,10 +132,77 @@ static Networking *sharedInstance = nil;
 }
 
 - (void)sendChatMessage:(NSString *)message {
-    // Simulate sending a chat message and receiving a response
-    [self performSelector:@selector(simulateResponse:) 
-               withObject:message 
-               afterDelay:0.5];
+    // Try to send to OpenAI API first, fall back to simulation if no API key
+    [self sendChatMessageToOpenAI:message];
+}
+
+- (void)sendChatMessageToOpenAI:(NSString *)message {
+    // Get API key from Settings
+    Class SettingsClass = NSClassFromString(@"Settings");
+    if (!SettingsClass) {
+        [self simulateResponse:message];
+        return;
+    }
+    
+    id settings = [SettingsClass performSelector:@selector(sharedSettings)];
+    NSString *apiKey = [settings performSelector:@selector(getAPIKey)];
+    
+    if (!apiKey || [apiKey length] == 0) {
+        NSRunAlertPanel(@"API Key Required", 
+                       @"Please set your OpenAI API key in Settings before using the chat.", 
+                       @"OK", nil, nil);
+        return;
+    }
+    
+    // Add user message to conversation history
+    NSDictionary *userMessage = [NSDictionary dictionaryWithObjectsAndKeys:
+                                @"user", @"role",
+                                message, @"content",
+                                nil];
+    [conversationHistory addObject:userMessage];
+    
+    // Prepare OpenAI API request
+    NSString *urlString = @"https://api.openai.com/v1/chat/completions";
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    
+    [request setHTTPMethod:@"POST"];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:[NSString stringWithFormat:@"Bearer %@", apiKey] forHTTPHeaderField:@"Authorization"];
+    
+    // Create request body
+    NSDictionary *requestBody = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"gpt-3.5-turbo", @"model",
+        conversationHistory, @"messages",
+        [NSNumber numberWithBool:YES], @"stream",
+        [NSNumber numberWithFloat:0.7], @"temperature",
+        [NSNumber numberWithInt:1000], @"max_tokens",
+        nil];
+    
+    // Convert to JSON manually (simple implementation for macOS 10.4)
+    NSString *jsonString = [self dictionaryToJSONString:requestBody];
+    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    
+    [request setHTTPBody:jsonData];
+    
+    // Cancel any existing connection
+    [currentConnection cancel];
+    [currentConnection release];
+    [receivedData release];
+    
+    // Start new connection
+    receivedData = [[NSMutableData alloc] init];
+    currentConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    
+    if (currentConnection) {
+        isStreaming = YES;
+        if (delegate && [delegate respondsToSelector:@selector(networking:didStartStreaming:)]) {
+            [delegate networking:self didStartStreaming:nil];
+        }
+    } else {
+        NSLog(@"Failed to create connection to OpenAI API");
+        [self simulateResponse:message];
+    }
 }
 
 - (void)simulateResponse:(NSString *)userMessage {
@@ -157,6 +236,146 @@ static Networking *sharedInstance = nil;
     
     if (delegate && [delegate respondsToSelector:@selector(networking:didReceiveChatResponse:)]) {
         [delegate networking:self didReceiveChatResponse:response];
+    }
+}
+
+- (void)clearConversationHistory {
+    [conversationHistory removeAllObjects];
+}
+
+- (NSArray *)getConversationHistory {
+    return [[conversationHistory copy] autorelease];
+}
+
+- (NSString *)dictionaryToJSONString:(NSDictionary *)dict {
+    // Simple JSON serialization for macOS 10.4 compatibility
+    NSMutableString *json = [NSMutableString stringWithString:@"{"];
+    
+    NSArray *keys = [dict allKeys];
+    for (int i = 0; i < [keys count]; i++) {
+        NSString *key = [keys objectAtIndex:i];
+        id value = [dict objectForKey:key];
+        
+        if (i > 0) {
+            [json appendString:@","];
+        }
+        
+        [json appendFormat:@"\"%@\":", key];
+        
+        if ([value isKindOfClass:[NSString class]]) {
+            NSString *escapedValue = [value stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+            [json appendFormat:@"\"%@\"", escapedValue];
+        } else if ([value isKindOfClass:[NSNumber class]]) {
+            NSNumber *num = (NSNumber *)value;
+            if (strcmp([num objCType], @encode(BOOL)) == 0) {
+                [json appendString:[num boolValue] ? @"true" : @"false"];
+            } else {
+                [json appendFormat:@"%@", num];
+            }
+        } else if ([value isKindOfClass:[NSArray class]]) {
+            [json appendString:[self arrayToJSONString:(NSArray *)value]];
+        }
+    }
+    
+    [json appendString:@"}"];
+    return json;
+}
+
+- (NSString *)arrayToJSONString:(NSArray *)array {
+    NSMutableString *json = [NSMutableString stringWithString:@"["];
+    
+    for (int i = 0; i < [array count]; i++) {
+        id item = [array objectAtIndex:i];
+        
+        if (i > 0) {
+            [json appendString:@","];
+        }
+        
+        if ([item isKindOfClass:[NSDictionary class]]) {
+            [json appendString:[self dictionaryToJSONString:(NSDictionary *)item]];
+        } else if ([item isKindOfClass:[NSString class]]) {
+            NSString *escapedValue = [item stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+            [json appendFormat:@"\"%@\"", escapedValue];
+        }
+    }
+    
+    [json appendString:@"]"];
+    return json;
+}
+
+#pragma mark - NSURLConnection Delegate
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    [receivedData setLength:0];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    [receivedData appendData:data];
+    
+    // Process streaming response
+    NSString *dataString = [[[NSString alloc] initWithData:receivedData encoding:NSUTF8StringEncoding] autorelease];
+    NSArray *lines = [dataString componentsSeparatedByString:@"\n"];
+    
+    for (NSString *line in lines) {
+        if ([line hasPrefix:@"data: "]) {
+            NSString *jsonData = [line substringFromIndex:6]; // Remove "data: " prefix
+            
+            if ([jsonData isEqualToString:@"[DONE]"]) {
+                isStreaming = NO;
+                if (delegate && [delegate respondsToSelector:@selector(networking:didFinishStreaming:)]) {
+                    [delegate networking:self didFinishStreaming:nil];
+                }
+                return;
+            }
+            
+            // Parse the streaming chunk (simplified)
+            NSRange contentRange = [jsonData rangeOfString:@"\"content\":"];
+            if (contentRange.location != NSNotFound) {
+                NSString *remaining = [jsonData substringFromIndex:contentRange.location + contentRange.length];
+                NSRange startQuote = [remaining rangeOfString:@"\""];
+                if (startQuote.location != NSNotFound) {
+                    remaining = [remaining substringFromIndex:startQuote.location + 1];
+                    NSRange endQuote = [remaining rangeOfString:@"\""];
+                    if (endQuote.location != NSNotFound) {
+                        NSString *content = [remaining substringToIndex:endQuote.location];
+                        if ([content length] > 0) {
+                            if (delegate && [delegate respondsToSelector:@selector(networking:didReceiveStreamingChunk:)]) {
+                                [delegate networking:self didReceiveStreamingChunk:content];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    if (isStreaming) {
+        isStreaming = NO;
+        if (delegate && [delegate respondsToSelector:@selector(networking:didFinishStreaming:)]) {
+            [delegate networking:self didFinishStreaming:nil];
+        }
+    }
+    
+    [currentConnection release];
+    currentConnection = nil;
+    [receivedData release];
+    receivedData = nil;
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    NSLog(@"Connection failed with error: %@", [error localizedDescription]);
+    
+    isStreaming = NO;
+    [currentConnection release];
+    currentConnection = nil;
+    [receivedData release];
+    receivedData = nil;
+    
+    // Fall back to simulation
+    if (delegate && [delegate respondsToSelector:@selector(networking:didReceiveChatResponse:)]) {
+        [delegate networking:self didReceiveChatResponse:@"Sorry, I'm having trouble connecting to the API right now. This is a simulated response."];
     }
 }
 

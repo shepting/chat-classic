@@ -38,13 +38,20 @@
 
 @interface Networking : NSObject {
     id<NetworkingDelegate> delegate;
+    NSMutableArray *conversationHistory;
+    NSURLConnection *currentConnection;
+    NSMutableData *receivedData;
+    BOOL isStreaming;
 }
 
 + (Networking *)sharedNetworking;
 - (void)setDelegate:(id<NetworkingDelegate>)delegate;
 - (void)sendRequest:(NetworkRequest *)request;
 - (void)sendChatMessage:(NSString *)message;
+- (void)sendChatMessageToOpenAI:(NSString *)message;
 - (void)simulateResponse:(NSString *)userMessage;
+- (void)clearConversationHistory;
+- (NSArray *)getConversationHistory;
 
 @end
 
@@ -53,4 +60,7 @@
 - (void)networking:(Networking *)networking didReceiveResponse:(NetworkResponse *)response forRequest:(NetworkRequest *)request;
 - (void)networking:(Networking *)networking didFailWithError:(NSError *)error forRequest:(NetworkRequest *)request;
 - (void)networking:(Networking *)networking didReceiveChatResponse:(NSString *)response;
+- (void)networking:(Networking *)networking didReceiveStreamingChunk:(NSString *)chunk;
+- (void)networking:(Networking *)networking didStartStreaming:(id)sender;
+- (void)networking:(Networking *)networking didFinishStreaming:(id)sender;
 @end

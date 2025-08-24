@@ -12,6 +12,9 @@
     ChatConversation *chatConversation;
     ChatInput *chatInput;
     Networking *networking;
+    
+    NSString *currentStreamingResponse;
+    BOOL isCurrentlyStreaming;
 }
 
 - (id)init;

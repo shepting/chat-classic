@@ -9,6 +9,7 @@ objc_library(
         "MainWindowController.h",
     ],
     visibility = ["//visibility:public"],
+    includes = ["."],
     sdk_frameworks = [
         "AppKit",
         "Foundation",
@@ -23,5 +24,6 @@ objc_library(
         "//Sources/ChatInput:ChatInput",
         "//Sources/HistoryTable:HistoryTable",
         "//Sources/Networking:Networking",
+        "//Sources/Settings:Settings",
     ],
 )

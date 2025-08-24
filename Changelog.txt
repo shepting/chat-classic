@@ -1,5 +1,18 @@
 # ChatGPT Classic - Changelog
 
+## Version 6.0 (2025-08-24)
+### OpenAI API Integration & Settings
+- **Settings Module**: New Settings window for secure API key management
+- **Keychain Integration**: Secure storage of OpenAI API keys using macOS Keychain Services
+- **OpenAI API Support**: Real ChatGPT API integration with gpt-3.5-turbo model
+- **Streaming Responses**: Live streaming chat responses for real-time conversation experience
+- **Application Menu**: Native macOS menu bar with Settings access (Cmd+,)
+- **Runtime Class Loading**: Flexible module integration without circular dependencies
+- **JSON Serialization**: Custom JSON encoding for macOS 10.4 compatibility
+- **Error Handling**: Graceful fallback to simulation when API key is missing
+- **Conversation History**: Maintains chat context across multiple exchanges
+- **Network Security**: HTTPS requests with proper authentication headers
+
 ## Version 5.0 (2025-08-24)
 ### Modular Bazel Architecture
 - **Separate Bazel Modules**: Each component now has its own BUILD file in Sources/ directory

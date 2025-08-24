@@ -30,6 +30,7 @@
     [chatInput release];
     [splitView release];
     [toolbarView release];
+    [currentStreamingResponse release];
     [super dealloc];
 }
 
@@ -93,6 +94,10 @@
     // Setup networking
     networking = [Networking sharedNetworking];
     [networking setDelegate:self];
+    
+    // Initialize streaming variables
+    currentStreamingResponse = nil;
+    isCurrentlyStreaming = NO;
 }
 
 - (void)setupToolbar {
@@ -146,8 +151,53 @@
 #pragma mark - NetworkingDelegate
 
 - (void)networking:(Networking *)networking didReceiveChatResponse:(NSString *)response {
-    // Add assistant response to conversation
+    // Add assistant response to conversation (fallback for non-streaming)
     [chatConversation addMessage:response fromSender:@"Assistant"];
+}
+
+- (void)networking:(Networking *)networking didStartStreaming:(id)sender {
+    isCurrentlyStreaming = YES;
+    [currentStreamingResponse release];
+    currentStreamingResponse = [[NSString alloc] init];
+    
+    // Add placeholder message that we'll update as we stream
+    [chatConversation addMessage:@"" fromSender:@"Assistant"];
+}
+
+- (void)networking:(Networking *)networking didReceiveStreamingChunk:(NSString *)chunk {
+    if (!isCurrentlyStreaming) return;
+    
+    // Append chunk to current response
+    NSString *newResponse = [currentStreamingResponse stringByAppendingString:chunk];
+    [currentStreamingResponse release];
+    currentStreamingResponse = [newResponse retain];
+    
+    // Update the last message in the conversation
+    NSMutableArray *messages = (NSMutableArray *)[chatConversation messages];
+    if ([messages count] > 0) {
+        ChatMessage *lastMessage = [messages lastObject];
+        if ([[lastMessage sender] isEqualToString:@"Assistant"]) {
+            // Update the text of the last assistant message
+            [lastMessage setText:currentStreamingResponse];
+            // Refresh the table view to show updated content
+            // Note: This is a simplified approach; in a real implementation
+            // you'd want more efficient updating
+            [chatConversation performSelector:@selector(scrollToBottom) withObject:nil afterDelay:0.0];
+        }
+    }
+}
+
+- (void)networking:(Networking *)networking didFinishStreaming:(id)sender {
+    isCurrentlyStreaming = NO;
+    
+    // Add final assistant message to conversation history (for Networking module)
+    if (currentStreamingResponse && [currentStreamingResponse length] > 0) {
+        NSDictionary *assistantMessage = [NSDictionary dictionaryWithObjectsAndKeys:
+                                         @"assistant", @"role",
+                                         currentStreamingResponse, @"content",
+                                         nil];
+        [[networking conversationHistory] addObject:assistantMessage];
+    }
 }
 
 @end
