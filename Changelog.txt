@@ -1,0 +1,44 @@
+# ChatGPT Classic - Changelog
+
+## Version 3.0 (2025-08-24)
+### Enhanced Input and Styling
+- Replace NSTextField with NSTextView for multi-line chat input
+- Increase input area height from 60px to 80px for better usability
+- Add Aqua-style Send button with NSRoundedBezelStyle
+- Implement placeholder text behavior for NSTextView ("Ask anything")
+- Add Enter key equivalent for Send button
+- Include proper focus handling with textDidBeginEditing/textDidEndEditing
+- Add scroll view wrapper for text input with auto-hiding scrollers
+
+## Version 2.0 (2025-08-24)
+### ChatGPT-Style Interface Implementation
+- Add toolbar view at top with "ChatGPT 5" title
+- Add chat input field at bottom with Send button
+- Reorganize layout: sidebar | (toolbar / messages / input)
+- Implement sendMessage action to add new messages
+- Auto-scroll to bottom when new messages are added
+- Remove table headers for cleaner message display
+- Organize design files into Design/ directory
+- Add .gitignore for Bazel artifacts and system files
+
+## Version 1.0 (2025-08-24)
+### Initial Release - Legacy macOS AppKit Project
+- AppKit application targeting macOS 10.4 Tiger
+- Split view interface with sidebar (NSOutlineView) and chat table (NSTableView)
+- Bazel build system using rules_apple 4.1.2
+- Manual memory management (retain/release, no ARC)
+- Comprehensive documentation for macOS 10.2-10.4 AppKit features
+- Basic window with sidebar showing conversation list
+- Chat messages display area
+- Legacy compatibility with PowerPC and Intel Macs
+- Complete Bazel build configuration with MODULE.bazel and WORKSPACE support
+
+---
+
+## Technical Notes
+- **Target Platform**: macOS 10.4 Tiger and later
+- **Architecture**: PowerPC and Intel (legacy compatibility)
+- **Memory Management**: Manual retain/release (no ARC)
+- **Build System**: Bazel with rules_apple 4.1.2
+- **UI Framework**: AppKit with programmatic layout
+- **Language**: Objective-C
