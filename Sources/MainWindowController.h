@@ -1,24 +1,22 @@
 #import <Cocoa/Cocoa.h>
+#import "HistoryTable.h"
+#import "ChatConversation.h"
+#import "ChatInput.h"
+#import "Networking.h"
 
-@interface MainWindowController : NSWindowController {
-    IBOutlet NSOutlineView *sidebarOutlineView;
-    IBOutlet NSTableView *chatTableView;
+@interface MainWindowController : NSWindowController <HistoryTableDelegate, ChatInputDelegate, NetworkingDelegate> {
     IBOutlet NSSplitView *splitView;
     IBOutlet NSView *toolbarView;
-    IBOutlet NSTextView *chatInputField;
-    IBOutlet NSButton *sendButton;
     
-    NSMutableArray *sidebarItems;
-    NSMutableArray *chatMessages;
+    HistoryTable *historyTable;
+    ChatConversation *chatConversation;
+    ChatInput *chatInput;
+    Networking *networking;
 }
 
 - (id)init;
 - (void)setupWindow;
-- (void)setupSidebar;
-- (void)setupChatTable;
+- (void)setupModules;
 - (void)setupToolbar;
-- (void)setupChatInput;
-- (IBAction)sendMessage:(id)sender;
-- (void)handleTextViewFocus:(NSTextView *)textView;
 
 @end

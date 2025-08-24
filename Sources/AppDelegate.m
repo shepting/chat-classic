@@ -1,5 +1,5 @@
 #import "AppDelegate.h"
-#import "MainWindowController.h"
+#import "App.h"
 
 @implementation AppDelegate
 
@@ -9,9 +9,11 @@
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
-    mainWindowController = [[MainWindowController alloc] init];
-    [mainWindowController showWindow:nil];
-    [[mainWindowController window] makeKeyAndOrderFront:nil];
+    App *app = [App sharedApp];
+    [app showMainWindow];
+    
+    // Keep reference to main window controller for compatibility
+    mainWindowController = [[app mainWindowController] retain];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {

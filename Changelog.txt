@@ -1,5 +1,19 @@
 # ChatGPT Classic - Changelog
 
+## Version 4.0 (2025-08-24)
+### Modular Architecture Refactor
+- **App Module**: Centralized application management with singleton pattern
+- **HistoryTable Module**: Dedicated conversation sidebar with delegate pattern
+- **ChatConversation Module**: Structured message display with ChatMessage model
+- **ChatInput Module**: Reusable input component with placeholder behavior
+- **Networking Module**: Simulated API communication with delegate callbacks
+- Refactor MainWindowController to use composition over inheritance
+- Implement delegate patterns for inter-module communication
+- Add conversation switching functionality in sidebar
+- Add simulated chatbot responses based on message content
+- Improve code organization and separation of concerns
+- Enhanced memory management with proper module lifecycle
+
 ## Version 3.0 (2025-08-24)
 ### Enhanced Input and Styling
 - Replace NSTextField with NSTextView for multi-line chat input

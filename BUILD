@@ -3,13 +3,23 @@ load("@rules_apple//apple:macos.bzl", "macos_application")
 objc_library(
     name = "ChatGPTClassicLib",
     srcs = [
+        "Sources/App.m",
         "Sources/AppDelegate.m",
+        "Sources/ChatConversation.m",
+        "Sources/ChatInput.m",
+        "Sources/HistoryTable.m",
         "Sources/MainWindowController.m",
+        "Sources/Networking.m",
         "Sources/main.m",
     ],
     hdrs = [
+        "Sources/App.h",
         "Sources/AppDelegate.h",
+        "Sources/ChatConversation.h",
+        "Sources/ChatInput.h",
+        "Sources/HistoryTable.h",
         "Sources/MainWindowController.h",
+        "Sources/Networking.h",
     ],
     sdk_frameworks = [
         "AppKit",
