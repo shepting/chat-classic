@@ -20,5 +20,6 @@ macos_application(
     entitlements = "Resources/ChatGPTClassic.entitlements",
     infoplists = ["Resources/Info.plist"],
     minimum_os_version = "10.4",
+    provisioning_profile = "Resources/Chat_Classic_Profile.provisionprofile",
     deps = [":ChatGPTClassicLib"],
 )
