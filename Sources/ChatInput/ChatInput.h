@@ -16,6 +16,7 @@
 - (NSString *)currentText;
 - (void)clearText;
 - (void)focusInput;
+- (void)resetInput;
 
 @end
 

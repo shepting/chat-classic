@@ -13,6 +13,9 @@
         [containerView setWantsLayer:YES];
         [[containerView layer] setBackgroundColor:[[NSColor colorWithCalibratedRed:0.98 green:0.98 blue:0.98 alpha:1.0] CGColor]];
         
+        // Make container accept first responder to handle clicks
+        [containerView setAcceptsTouchEvents:YES];
+        
         NSRect containerBounds = [containerView bounds];
         
         // Create scroll view for multi-line text input
@@ -32,6 +35,14 @@
         [textView setFont:[NSFont systemFontOfSize:13]];
         [textView setTextContainerInset:NSMakeSize(5, 5)];
         [textView setDelegate:self];
+        
+        // Ensure text view is editable and selectable
+        [textView setEditable:YES];
+        [textView setSelectable:YES];
+        [textView setFieldEditor:NO];
+        [textView setUsesFontPanel:NO];
+        [textView setUsesRuler:NO];
+        [textView setContinuousSpellCheckingEnabled:NO];
         
         // Set placeholder text
         [self showPlaceholder];
@@ -81,7 +92,27 @@
 }
 
 - (void)focusInput {
+    // Ensure the text view can accept focus
+    [textView setEditable:YES];
+    [textView setSelectable:YES];
     [[textView window] makeFirstResponder:textView];
+    
+    // If placeholder is showing, select all so user can just start typing
+    if (isShowingPlaceholder) {
+        [textView selectAll:nil];
+    }
+}
+
+- (void)resetInput {
+    // Reset all text view properties to ensure it's editable
+    [textView setEditable:YES];
+    [textView setSelectable:YES];
+    [textView setFieldEditor:NO];
+    [textView setString:@""];
+    [textView setTextColor:[NSColor blackColor]];
+    isShowingPlaceholder = NO;
+    [self showPlaceholder];
+    [self focusInput];
 }
 
 - (void)showPlaceholder {
@@ -129,6 +160,19 @@
     if (editingTextView == textView && isShowingPlaceholder) {
         [self hidePlaceholder];
     }
+}
+
+- (BOOL)textShouldBeginEditing:(NSText *)aTextObject {
+    // Always allow editing
+    return YES;
+}
+
+- (BOOL)textView:(NSTextView *)aTextView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString {
+    // If we're showing placeholder, clear it when user starts typing
+    if (aTextView == textView && isShowingPlaceholder) {
+        [self hidePlaceholder];
+    }
+    return YES;
 }
 
 - (void)textDidEndEditing:(NSNotification *)notification {

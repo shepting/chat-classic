@@ -15,6 +15,7 @@
     if (self) {
         [window setTitle:@"ChatGPT Classic"];
         [window setMinSize:NSMakeSize(600, 400)];
+        [window setAcceptsMouseMovedEvents:YES];
         
         [self setupWindow];
         [self setupModules];
@@ -98,6 +99,9 @@
     // Initialize streaming variables
     currentStreamingResponse = nil;
     isCurrentlyStreaming = NO;
+    
+    // Reset and focus the input field when window is ready
+    [chatInput performSelector:@selector(resetInput) withObject:nil afterDelay:0.1];
 }
 
 - (void)setupToolbar {
