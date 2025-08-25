@@ -1,5 +1,5 @@
 #import <Cocoa/Cocoa.h>
-#import <Security/Security.h>
+#import "Keychain.h"
 
 @interface Settings : NSObject {
     NSWindow *settingsWindow;

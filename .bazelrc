@@ -1,0 +1,12 @@
+# Build configuration for ChatGPT Classic
+
+# === General (language-agnostic) ===
+# Increase max-heap-size, attempt to avoid OOM
+startup --host_jvm_args=-Xmx16g
+
+# Set minimum macOS version using Bazel's native Apple configuration
+build --host_macos_minimum_os=10.4
+build --macos_minimum_os=10.4
+
+# Disable ARC for legacy compatibility across all modules
+build --copt=-fno-objc-arc

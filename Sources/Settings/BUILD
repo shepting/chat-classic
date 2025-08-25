@@ -4,13 +4,11 @@ objc_library(
     hdrs = ["Settings.h"],
     visibility = ["//visibility:public"],
     includes = ["."],
+    deps = [
+        "//Sources/Keychain:Keychain",
+    ],
     sdk_frameworks = [
         "AppKit",
         "Foundation",
-        "Security",
-    ],
-    copts = [
-        "-fno-objc-arc",
-        "-mmacosx-version-min=10.4",
     ],
 )

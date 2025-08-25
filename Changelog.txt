@@ -1,5 +1,13 @@
 # ChatGPT Classic - Changelog
 
+## Version 6.1 (2025-08-25)
+### Compiler Warning Fixes
+- **Protocol Conformance**: Fix NSTextViewDelegate protocol conformance in ChatInput class
+- **Table View Protocols**: Fix NSTableViewDataSource and NSTableViewDelegate protocol conformance in ChatConversation class
+- **Type Safety**: Fix integer precision warnings by changing int parameters to NSInteger
+- **Variable Shadowing**: Resolve variable shadowing in MainWindowController delegate methods
+- **API Encapsulation**: Add conversationHistory getter method to Networking class for proper access
+
 ## Version 6.0 (2025-08-24)
 ### OpenAI API Integration & Settings
 - **Settings Module**: New Settings window for secure API key management

@@ -106,84 +106,11 @@ static Settings *sharedSettingsInstance = nil;
 }
 
 - (NSString *)getAPIKey {
-    const char *serviceName = "ChatGPTClassic";
-    const char *accountName = "OpenAI_API_Key";
-    
-    void *passwordData = NULL;
-    UInt32 passwordLength = 0;
-    
-    OSStatus status = SecKeychainFindGenericPassword(
-        NULL,                           // Default keychain
-        strlen(serviceName),           // Service name length
-        serviceName,                   // Service name
-        strlen(accountName),           // Account name length
-        accountName,                   // Account name
-        &passwordLength,               // Password length
-        &passwordData,                 // Password data
-        NULL                           // Keychain item reference
-    );
-    
-    if (status == errSecSuccess && passwordData != NULL) {
-        NSString *apiKey = [[[NSString alloc] 
-            initWithBytes:passwordData 
-            length:passwordLength 
-            encoding:NSUTF8StringEncoding] autorelease];
-        
-        SecKeychainItemFreeContent(NULL, passwordData);
-        return apiKey;
-    }
-    
-    return nil;
+    return [[Keychain sharedKeychain] getAPIKeyForService:@"ChatGPTClassic" account:@"OpenAI_API_Key"];
 }
 
 - (BOOL)setAPIKey:(NSString *)apiKey {
-    if (!apiKey || [apiKey length] == 0) {
-        return NO;
-    }
-    
-    const char *serviceName = "ChatGPTClassic";
-    const char *accountName = "OpenAI_API_Key";
-    const char *passwordData = [apiKey UTF8String];
-    UInt32 passwordLength = strlen(passwordData);
-    
-    // Try to update existing keychain item first
-    SecKeychainItemRef itemRef = NULL;
-    OSStatus findStatus = SecKeychainFindGenericPassword(
-        NULL,
-        strlen(serviceName),
-        serviceName,
-        strlen(accountName),
-        accountName,
-        NULL,
-        NULL,
-        &itemRef
-    );
-    
-    OSStatus status;
-    if (findStatus == errSecSuccess && itemRef != NULL) {
-        // Update existing item
-        status = SecKeychainItemModifyContent(
-            itemRef,
-            NULL,
-            passwordLength,
-            passwordData
-        );
-        CFRelease(itemRef);
-    } else {
-        // Create new keychain item
-        status = SecKeychainAddGenericPassword(
-            NULL,                       // Default keychain
-            strlen(serviceName),       // Service name length
-            serviceName,               // Service name
-            strlen(accountName),       // Account name length
-            accountName,               // Account name
-            passwordLength,            // Password length
-            passwordData,              // Password data
-            NULL                       // Keychain item reference
-        );
-    }
-    
-    return (status == errSecSuccess);
+    return [[Keychain sharedKeychain] setAPIKey:apiKey forService:@"ChatGPTClassic" account:@"OpenAI_API_Key"];
 }
 
 - (IBAction)saveButtonClicked:(id)sender {

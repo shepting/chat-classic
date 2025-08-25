@@ -14,10 +14,6 @@ objc_library(
         "AppKit",
         "Foundation",
     ],
-    copts = [
-        "-fno-objc-arc",
-        "-mmacosx-version-min=10.4",
-    ],
     deps = [
         "//Sources/App:App",
         "//Sources/ChatConversation:ChatConversation",
