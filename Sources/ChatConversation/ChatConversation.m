@@ -2,7 +2,7 @@
 
 @implementation ChatMessage
 
-@synthesize text, sender, timestamp;
+@synthesize text, sender, timestamp, isSpinner;
 
 - (id)initWithText:(NSString *)messageText sender:(NSString *)messageSender {
     self = [super init];
@@ -10,19 +10,93 @@
         self.text = messageText;
         self.sender = messageSender;
         self.timestamp = [NSDate date];
+        self.isSpinner = NO;
+        animationTimer = nil;
+        animationState = 0;
+    }
+    return self;
+}
+
+- (id)initSpinnerMessageWithSender:(NSString *)messageSender {
+    self = [super init];
+    if (self) {
+        self.text = @"";
+        self.sender = messageSender;
+        self.timestamp = [NSDate date];
+        self.isSpinner = YES;
+        animationTimer = nil;
+        animationState = 0;
     }
     return self;
 }
 
 - (void)dealloc {
+    [self stopSpinnerAnimation];
     [text release];
     [sender release];
     [timestamp release];
     [super dealloc];
 }
 
+- (void)startSpinnerAnimation:(NSTableView *)tableView row:(NSInteger)row {
+    if (!isSpinner || animationTimer) return;
+    
+    // Create timer that fires every 0.5 seconds for smooth animation
+    animationTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
+                                                      target:self
+                                                    selector:@selector(animateSpinner:)
+                                                    userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                             tableView, @"tableView",
+                                                             [NSNumber numberWithInteger:row], @"row",
+                                                             nil]
+                                                     repeats:YES];
+    [animationTimer retain];
+}
+
+- (void)stopSpinnerAnimation {
+    if (animationTimer) {
+        [animationTimer invalidate];
+        [animationTimer release];
+        animationTimer = nil;
+    }
+    animationState = 0;
+}
+
+- (void)animateSpinner:(NSTimer *)timer {
+    NSDictionary *userInfo = [timer userInfo];
+    NSTableView *tableView = [userInfo objectForKey:@"tableView"];
+    NSInteger row = [[userInfo objectForKey:@"row"] integerValue];
+    
+    // Cycle through animation states (0, 1, 2, 3)
+    animationState = (animationState + 1) % 4;
+    
+    // Update the text property with current spinner state
+    [text release];
+    text = [[self currentSpinnerText] retain];
+    
+    // Refresh the table view row
+    if (tableView && row >= 0) {
+        [tableView reloadDataForRowIndexes:[NSIndexSet indexSetWithIndex:row]
+                             columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
+}
+
+- (NSString *)currentSpinnerText {
+    if (!isSpinner) return text;
+    
+    switch (animationState) {
+        case 0: return @"";
+        case 1: return @"•";
+        case 2: return @"••";
+        case 3: return @"•••";
+        default: return @"";
+    }
+}
+
 - (NSString *)description {
-    if ([sender isEqualToString:@"User"]) {
+    if (isSpinner) {
+        return [self currentSpinnerText];
+    } else if ([sender isEqualToString:@"User"]) {
         return text;
     } else {
         return [NSString stringWithFormat:@"%@: %@", sender, text];
@@ -71,6 +145,8 @@
 }
 
 - (void)dealloc {
+    // Stop any active spinner animations before dealloc
+    [self removeSpinnerMessages];
     [messages release];
     [tableView release];
     [mainView release];
@@ -105,6 +181,45 @@
 - (void)scrollToBottom {
     if ([messages count] > 0) {
         [tableView scrollRowToVisible:[messages count] - 1];
+    }
+}
+
+- (ChatMessage *)addSpinnerMessage:(NSString *)sender {
+    // Remove any existing spinner messages first
+    [self removeSpinnerMessages];
+    
+    // Create and add new spinner message
+    ChatMessage *spinnerMessage = [[ChatMessage alloc] initSpinnerMessageWithSender:sender];
+    [messages addObject:spinnerMessage];
+    [tableView reloadData];
+    [self scrollToBottom];
+    
+    // Start the animation
+    NSInteger row = [messages count] - 1;
+    [spinnerMessage startSpinnerAnimation:tableView row:row];
+    
+    return [spinnerMessage autorelease];
+}
+
+- (void)removeSpinnerMessages {
+    // Find and remove all spinner messages
+    NSMutableArray *spinnersToRemove = [[NSMutableArray alloc] init];
+    
+    for (ChatMessage *message in messages) {
+        if ([message isSpinner]) {
+            [message stopSpinnerAnimation];
+            [spinnersToRemove addObject:message];
+        }
+    }
+    
+    for (ChatMessage *spinner in spinnersToRemove) {
+        [messages removeObject:spinner];
+    }
+    
+    [spinnersToRemove release];
+    
+    if ([spinnersToRemove count] > 0) {
+        [tableView reloadData];
     }
 }
 
