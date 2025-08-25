@@ -34,9 +34,7 @@
         [conversations addObject:@"Previous Chat 2"];
         
         // Store the scroll view as our main view
-        [scrollView retain]; // We'll release this in dealloc
-        [self setValue:scrollView forKey:@"mainView"];
-        [scrollView release]; // Release our local reference
+        mainView = [scrollView retain];
     }
     return self;
 }
@@ -44,12 +42,12 @@
 - (void)dealloc {
     [conversations release];
     [outlineView release];
-    [[self valueForKey:@"mainView"] release];
+    [mainView release];
     [super dealloc];
 }
 
 - (NSView *)view {
-    return [self valueForKey:@"mainView"];
+    return mainView;
 }
 
 - (void)setDelegate:(id<HistoryTableDelegate>)newDelegate {

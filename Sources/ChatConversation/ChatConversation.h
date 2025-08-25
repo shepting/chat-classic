@@ -17,6 +17,7 @@
 @interface ChatConversation : NSObject {
     NSTableView *tableView;
     NSMutableArray *messages;
+    NSScrollView *mainView;
 }
 
 - (id)initWithFrame:(NSRect)frame;

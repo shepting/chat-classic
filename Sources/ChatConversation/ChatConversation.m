@@ -65,9 +65,7 @@
         [self addMessage:@"Compatible with macOS 10.4 Tiger and later." fromSender:@"System"];
         
         // Store the scroll view as our main view
-        [scrollView retain]; // We'll release this in dealloc
-        [self setValue:scrollView forKey:@"mainView"];
-        [scrollView release]; // Release our local reference
+        mainView = [scrollView retain];
     }
     return self;
 }
@@ -75,12 +73,12 @@
 - (void)dealloc {
     [messages release];
     [tableView release];
-    [[self valueForKey:@"mainView"] release];
+    [mainView release];
     [super dealloc];
 }
 
 - (NSView *)view {
-    return [self valueForKey:@"mainView"];
+    return mainView;
 }
 
 - (void)addMessage:(NSString *)text fromSender:(NSString *)sender {

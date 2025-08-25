@@ -6,6 +6,7 @@
     NSOutlineView *outlineView;
     NSMutableArray *conversations;
     id<HistoryTableDelegate> delegate;
+    NSScrollView *mainView;
 }
 
 - (id)initWithFrame:(NSRect)frame;
