@@ -2,7 +2,7 @@
 
 @protocol ChatInputDelegate;
 
-@interface ChatInput : NSObject {
+@interface ChatInput : NSObject <NSTextViewDelegate> {
     NSView *containerView;
     NSTextView *textView;
     NSButton *sendButton;

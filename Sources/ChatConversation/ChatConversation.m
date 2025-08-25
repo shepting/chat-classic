@@ -110,11 +110,11 @@
 
 #pragma mark - NSTableView DataSource
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView {
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
     return [messages count];
 }
 
-- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row {
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
     if (row < [messages count]) {
         ChatMessage *message = [messages objectAtIndex:row];
         return [message description];

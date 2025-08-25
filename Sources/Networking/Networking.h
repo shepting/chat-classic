@@ -52,6 +52,7 @@
 - (void)simulateResponse:(NSString *)userMessage;
 - (void)clearConversationHistory;
 - (NSArray *)getConversationHistory;
+- (NSMutableArray *)conversationHistory;
 
 @end
 

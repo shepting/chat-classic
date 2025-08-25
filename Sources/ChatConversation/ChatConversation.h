@@ -14,7 +14,7 @@
 
 @end
 
-@interface ChatConversation : NSObject {
+@interface ChatConversation : NSObject <NSTableViewDataSource, NSTableViewDelegate> {
     NSTableView *tableView;
     NSMutableArray *messages;
     NSScrollView *mainView;

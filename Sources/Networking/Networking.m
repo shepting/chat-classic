@@ -247,6 +247,10 @@ static Networking *sharedInstance = nil;
     return [[conversationHistory copy] autorelease];
 }
 
+- (NSMutableArray *)conversationHistory {
+    return conversationHistory;
+}
+
 - (NSString *)dictionaryToJSONString:(NSDictionary *)dict {
     // Simple JSON serialization for macOS 10.4 compatibility
     NSMutableString *json = [NSMutableString stringWithString:@"{"];

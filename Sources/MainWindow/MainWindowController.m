@@ -150,12 +150,12 @@
 
 #pragma mark - NetworkingDelegate
 
-- (void)networking:(Networking *)networking didReceiveChatResponse:(NSString *)response {
+- (void)networking:(Networking *)networkingService didReceiveChatResponse:(NSString *)response {
     // Add assistant response to conversation (fallback for non-streaming)
     [chatConversation addMessage:response fromSender:@"Assistant"];
 }
 
-- (void)networking:(Networking *)networking didStartStreaming:(id)sender {
+- (void)networking:(Networking *)networkingService didStartStreaming:(id)sender {
     isCurrentlyStreaming = YES;
     [currentStreamingResponse release];
     currentStreamingResponse = [[NSString alloc] init];
@@ -164,7 +164,7 @@
     [chatConversation addMessage:@"" fromSender:@"Assistant"];
 }
 
-- (void)networking:(Networking *)networking didReceiveStreamingChunk:(NSString *)chunk {
+- (void)networking:(Networking *)networkingService didReceiveStreamingChunk:(NSString *)chunk {
     if (!isCurrentlyStreaming) return;
     
     // Append chunk to current response
@@ -187,7 +187,7 @@
     }
 }
 
-- (void)networking:(Networking *)networking didFinishStreaming:(id)sender {
+- (void)networking:(Networking *)networkingService didFinishStreaming:(id)sender {
     isCurrentlyStreaming = NO;
     
     // Add final assistant message to conversation history (for Networking module)
