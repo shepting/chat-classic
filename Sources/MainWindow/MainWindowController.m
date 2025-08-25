@@ -139,6 +139,9 @@
     // Add user message to conversation
     [chatConversation addMessage:message fromSender:@"User"];
     
+    // Add spinner message to show we're waiting for response
+    [chatConversation addSpinnerMessage:@"Assistant"];
+    
     // Send message through networking for response
     [networking sendChatMessage:message];
 }
@@ -151,7 +154,8 @@
 #pragma mark - NetworkingDelegate
 
 - (void)networking:(Networking *)networking didReceiveChatResponse:(NSString *)response {
-    // Add assistant response to conversation (fallback for non-streaming)
+    // Remove spinner and add assistant response (fallback for non-streaming)
+    [chatConversation removeSpinnerMessages];
     [chatConversation addMessage:response fromSender:@"Assistant"];
 }
 
@@ -160,7 +164,8 @@
     [currentStreamingResponse release];
     currentStreamingResponse = [[NSString alloc] init];
     
-    // Add placeholder message that we'll update as we stream
+    // Remove spinner and add placeholder message that we'll update as we stream
+    [chatConversation removeSpinnerMessages];
     [chatConversation addMessage:@"" fromSender:@"Assistant"];
 }
 

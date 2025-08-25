@@ -1,5 +1,13 @@
 # ChatGPT Classic - Changelog
 
+## Version 6.1 (2025-08-24)
+### Animated Loading Spinner
+- **Three-Dots Animation**: Pulsing spinner (•, ••, •••) shows while waiting for API responses
+- **Timer-Based Animation**: Smooth 0.5-second cycle animation using NSTimer
+- **Automatic Management**: Spinner appears on message send, disappears when response starts
+- **Memory Safety**: Proper timer cleanup and animation lifecycle management
+- **Visual Feedback**: Clear indication of pending API requests and processing state
+
 ## Version 6.0 (2025-08-24)
 ### OpenAI API Integration & Settings
 - **Settings Module**: New Settings window for secure API key management
