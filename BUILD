@@ -16,7 +16,7 @@ objc_library(
 macos_application(
     name = "ChatGPTClassic",
     app_icons = [],
-    bundle_id = "com.example.chatgptclassic",
+    bundle_id = "com.protospec.chatclassic",
     entitlements = "Resources/ChatGPTClassic.entitlements",
     infoplists = ["Resources/Info.plist"],
     minimum_os_version = "10.4",

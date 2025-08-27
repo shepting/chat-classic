@@ -113,6 +113,13 @@ static App *sharedAppInstance = nil;
     
     // Show main window
     [self showMainWindow];
+    
+    // Check for screenshot environment variable
+    NSString *screenshotEnv = [[[NSProcessInfo processInfo] environment] objectForKey:@"CHAT_CLASSIC_SCREENSHOT"];
+    if (screenshotEnv && [screenshotEnv length] > 0) {
+        // Take screenshot after a brief delay to ensure window is fully rendered
+        [self performSelector:@selector(takeScreenshotAndQuit) withObject:nil afterDelay:0.1];
+    }
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {

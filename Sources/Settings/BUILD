@@ -5,7 +5,7 @@ objc_library(
     visibility = ["//visibility:public"],
     includes = ["."],
     deps = [
-        "//Sources/Keychain:Keychain",
+        "//Sources/Services/KeychainService:Keychain",
     ],
     sdk_frameworks = [
         "AppKit",
